@@ -12,11 +12,11 @@ let rec loop p () =
   | true -> Raylib.close_window ()
   | false ->
       let open Raylib in
+      let background = Color.create 0x68 0x83 0xf5 0xff in
+      let foreground = Color.create 0xf5 0x68 0x83 0xff in
       begin_drawing ();
-      clear_background Color.raywhite;
-      draw_text "Congrats! You created your first window!" 190 200 20
-        Color.lightgray;
-      draw_rectangle p.pos_x p.pos_y p.width p.height Color.red;
+      clear_background background;
+      draw_rectangle p.pos_x p.pos_y p.width p.height foreground;
       end_drawing ();
       (* just add 1 to x and y for testing... *)
       loop (update_player p 1 1) ()
