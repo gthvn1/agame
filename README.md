@@ -1,4 +1,4 @@
-# OgameL
+# OCRay
 
 Try to write a "game" in OCaml using Raylib...
 
