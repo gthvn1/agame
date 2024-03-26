@@ -1,6 +1,16 @@
-external myadd : int -> int -> int = "caml_add"
+let setup () =
+        Raylib.init_window 800 450 "raylib example";
+        Raylib.set_target_fps 60
 
-let () =
-  let res : int = myadd 40 2 in
-  let answer : string = string_of_int res in
-  print_endline @@ "The answer is " ^ answer
+let rec loop () =
+        match Raylib.window_should_close () with
+        | true -> Raylib.close_window ()
+        | false ->
+            let open Raylib in
+            begin_drawing ();
+            clear_background Color.raywhite;
+            draw_text "Congrats! You created your first window!" 190 200 20 Color.lightgray;
+            end_drawing ();
+            loop ()
+
+let () = setup () |> loop

@@ -1,5 +1,0 @@
-(library
- (name answer)
- (foreign_stubs
-  (language c)
-  (names answer)))
