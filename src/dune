@@ -1,3 +1,4 @@
 (executable
-  (public_name ogamel)
-  (name main))
+ (public_name ocray)
+ (name main)
+ (libraries answer))
