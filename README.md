@@ -1,4 +1,4 @@
-# Ogamel
+# OgameL
 
 Try to write a "game" in OCaml using Raylib...
 
