@@ -18,22 +18,22 @@ let setup () =
   s
 
 let rec loop (s : State.t) =
-  match Raylib.window_should_close () with
-  | true -> Raylib.close_window ()
+  let open Raylib in
+  match window_should_close () with
+  | true -> close_window ()
   | false ->
-      let open Raylib in
-      let rate : float = get_frame_time () in
-      let rate = rate *. s.acceleration in
+      let frate : float = get_frame_time () in
+      let velocity = frate *. s.acceleration in
 
       (* Update the state *)
       let delta_y =
-        if is_key_down Key.Down then rate
-        else if is_key_down Key.Up then -1.0 *. rate
+        if is_key_down Key.Down then velocity
+        else if is_key_down Key.Up then -1.0 *. velocity
         else 0.0
       in
       let delta_x =
-        if is_key_down Key.Right then rate
-        else if is_key_down Key.Left then -1.0 *. rate
+        if is_key_down Key.Right then velocity
+        else if is_key_down Key.Left then -1.0 *. velocity
         else 0.0
       in
       let s' =
