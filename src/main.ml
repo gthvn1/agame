@@ -14,12 +14,16 @@ let rec loop p () =
       let open Raylib in
       let background = Color.create 0x68 0x83 0xf5 0xff in
       let foreground = Color.create 0xf5 0x68 0x83 0xff in
+      (* Update the state *)
+      (* just add 1 to x and y for testing... *)
+      let new_player = update_player p 1 1 in
+
+      (* Drawing *)
       begin_drawing ();
       clear_background background;
       draw_rectangle p.pos_x p.pos_y p.width p.height foreground;
       end_drawing ();
-      (* just add 1 to x and y for testing... *)
-      loop (update_player p 1 1) ()
+      loop new_player ()
 
 let () =
   let p : player = { pos_x = 10; pos_y = 10; width = 10; height = 10 } in
