@@ -30,25 +30,51 @@ let setup () =
   Raylib.set_target_fps 60;
   s
 
-(** [update state] updates and returns a new state. *)
+(** [update state] updates and returns a new state.
+ *   player1:
+ *       a  --> move left
+ *       s  --> move down
+ *       d  --> move up
+ *       f  --> move right
+ *   player2:
+ *       h  --> move left
+ *       j  --> move down
+ *       k  --> move up
+ *       l  --> move right
+ *)
 let update (s : State.t) =
   let open Raylib in
   let frate : float = get_frame_time () in
   let velocity = frate *. s.acceleration in
+
+  (* Update player 1 according to key press *)
   let delta_y =
-    if is_key_down Key.Down then velocity
-    else if is_key_down Key.Up then -1.0 *. velocity
+    if is_key_down Key.S then velocity
+    else if is_key_down Key.D then -1.0 *. velocity
     else 0.0
   in
   let delta_x =
-    if is_key_down Key.Right then velocity
-    else if is_key_down Key.Left then -1.0 *. velocity
+    if is_key_down Key.F then velocity
+    else if is_key_down Key.A then -1.0 *. velocity
     else 0.0
   in
   let s =
     State.update_player1 s (int_of_float delta_x) (int_of_float delta_y)
   in
-  let s = State.update_player2 s 0 0 (* currently player2 is not updated *) in
+  (* Update player 2 according to key press *)
+  let delta_y =
+    if is_key_down Key.J then velocity
+    else if is_key_down Key.K then -1.0 *. velocity
+    else 0.0
+  in
+  let delta_x =
+    if is_key_down Key.L then velocity
+    else if is_key_down Key.H then -1.0 *. velocity
+    else 0.0
+  in
+  let s =
+    State.update_player2 s (int_of_float delta_x) (int_of_float delta_y)
+  in
   State.increment_acceleration s 1.0
 
 (** [draw state] draws the scene and return [state]. *)
