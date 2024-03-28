@@ -1,6 +1,6 @@
 (lang dune 3.14)
-(name ocray)
+(name opong)
 (package
-  (name ocray)
+  (name opong)
   (synopsis "Attempt to build a game in OCaml")
   (depends ocaml dune))

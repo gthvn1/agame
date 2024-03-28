@@ -1,4 +1,4 @@
 (executable
- (public_name ocray)
+ (public_name opong)
  (name main)
  (libraries raylib))

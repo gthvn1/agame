@@ -1,6 +1,6 @@
-# OCRay
+# OPong
 
-Try to write a "game" in OCaml using Raylib...
+Try to write a "pong game" in OCaml using Raylib...
 
 # Installation
 - we created a new switch locally for the project
@@ -11,7 +11,7 @@ Try to write a "game" in OCaml using Raylib...
 - you also need to install the [raylib ocaml bindings](https://ocaml.org/p/raylib/0.5.1)
     - automatically install dependencies: `opam depext raylib`
     - and install raylib: `opam install raylib`
-- we can run the project using `dune exec ocray`
+- we can run the project using `dune exec opong`
 
 ## Links
 
