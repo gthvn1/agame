@@ -1,5 +1,6 @@
 type t = {
-  player : Player.t;
+  player1 : Player.t;
+  player2 : Player.t;
   window_width : int;
   window_height : int;
   background : Raylib.Color.t;
@@ -7,11 +8,17 @@ type t = {
   acceleration : float;
 }
 
-let update_player (s : t) dx dy =
+let update_player1 (s : t) dx dy =
   let new_p =
-    Player.update_player s.player dx dy s.window_width s.window_height
+    Player.update_player s.player1 dx dy s.window_width s.window_height
   in
-  { s with player = new_p }
+  { s with player1 = new_p }
+
+let update_player2 (s : t) dx dy =
+  let new_p =
+    Player.update_player s.player2 dx dy s.window_width s.window_height
+  in
+  { s with player2 = new_p }
 
 let increment_acceleration (s : t) v =
   (* we limite the acceleration to 1000.0 *)
