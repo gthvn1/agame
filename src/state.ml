@@ -4,7 +4,6 @@ type t = {
   window_width : int;
   window_height : int;
   background : Raylib.Color.t;
-  foreground : Raylib.Color.t;
   acceleration : float;
 }
 

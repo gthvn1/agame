@@ -1,4 +1,10 @@
-type t = { pos_x : int; pos_y : int; width : int; height : int }
+type t = {
+  pos_x : int;
+  pos_y : int;
+  width : int;
+  height : int;
+  color : Raylib.Color.t;
+}
 
 let update_player (p : t) (dx : int) (dy : int) (maxx : int) (maxy : int) =
   (* Check x boundary *)
