@@ -1,6 +1,7 @@
 type t = {
   player1 : Player.t;
   player2 : Player.t;
+  ball : Ball.t;
   window_width : int;
   window_height : int;
   background : Raylib.Color.t;

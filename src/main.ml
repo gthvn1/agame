@@ -21,6 +21,14 @@ let setup () =
           height = p_height;
           color = Raylib.Color.create 0x83 0xf5 0x68 0xff;
         };
+      ball =
+        {
+          (* Let's put the ball in random place for now *)
+          pos_x = 40;
+          pos_y = 40;
+          radius = 5.0;
+          color = Raylib.Color.black;
+        };
       window_width = w_width;
       window_height = w_height;
       background = Raylib.Color.create 0x68 0x83 0xf5 0xff;
@@ -33,61 +41,49 @@ let setup () =
 
 (** [update state] updates and returns a new state.
  *   player1:
- *       a  --> move left
+ *       a  --> move left   --> will be Q for french kb
  *       s  --> move down
  *       d  --> move up
  *       f  --> move right
  *   player2:
- *       h  --> move left
- *       j  --> move down
- *       k  --> move up
- *       l  --> move right
+ *       j  --> move left
+ *       k  --> move down
+ *       l  --> move up
+ *       semicolon  --> move right  --> will be m for french kb
  *)
 let update (s : State.t) =
   let open Raylib in
   let frate : float = get_frame_time () in
-  let velocity = frate *. s.acceleration in
-
+  let velocity = int_of_float @@ (frate *. s.acceleration) in
+  let delta key_up key_down =
+    if is_key_down key_down then velocity
+    else if is_key_down key_up then -1 * velocity
+    else 0
+  in
   (* Update player 1 according to key press *)
-  let delta_y =
-    if is_key_down Key.S then velocity
-    else if is_key_down Key.D then -1.0 *. velocity
-    else 0.0
-  in
-  let delta_x =
-    if is_key_down Key.F then velocity
-    else if is_key_down Key.A then -1.0 *. velocity
-    else 0.0
-  in
-  let s =
-    State.update_player1 s (int_of_float delta_x) (int_of_float delta_y)
-  in
+  let s = State.update_player1 s (delta Key.A Key.F) (delta Key.D Key.S) in
   (* Update player 2 according to key press *)
-  let delta_y =
-    if is_key_down Key.J then velocity
-    else if is_key_down Key.K then -1.0 *. velocity
-    else 0.0
-  in
-  let delta_x =
-    if is_key_down Key.L then velocity
-    else if is_key_down Key.H then -1.0 *. velocity
-    else 0.0
-  in
   let s =
-    State.update_player2 s (int_of_float delta_x) (int_of_float delta_y)
+    State.update_player2 s (delta Key.J Key.Semicolon) (delta Key.K Key.L)
   in
-  State.increment_acceleration s 1.0
+  (* and return the state after incrementing a little bit the speed *)
+  State.increment_acceleration s 0.1
 
 (** [draw state] draws the scene and return [state]. *)
 let draw (s : State.t) =
   let open Raylib in
   begin_drawing ();
   clear_background s.background;
+
   (* draw players *)
   draw_rectangle s.player1.pos_x s.player1.pos_y s.player1.width
     s.player1.height s.player1.color;
   draw_rectangle s.player2.pos_x s.player2.pos_y s.player2.width
     s.player2.height s.player2.color;
+
+  (* draw the ball *)
+  draw_circle s.ball.pos_x s.ball.pos_y s.ball.radius s.ball.color;
+
   (* draw the sepration line that in the middle *)
   draw_line (s.window_width / 2) 0 (s.window_width / 2) s.window_height
     Color.black;
