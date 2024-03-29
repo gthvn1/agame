@@ -1,32 +1,33 @@
 (** [setup] sets state [s], init the window and return [s]. *)
 let setup () =
-  let width, height = (800, 450) in
+  let w_width, w_height = (800, 450) in
+  let p_width, p_height = (8, 64) in
   let s : State.t =
     {
       (* it is the upper left corner that is center... *)
       player1 =
         {
           pos_x = 10;
-          pos_y = height / 2;
-          width = 8;
-          height = 64;
+          pos_y = (w_height - p_height) / 2;
+          width = p_width;
+          height = p_height;
           color = Raylib.Color.create 0xf5 0x68 0x83 0xff;
         };
       player2 =
         {
-          pos_x = width - 10;
-          pos_y = height / 2;
-          width = 8;
-          height = 64;
+          pos_x = w_width - 10 - p_width;
+          pos_y = (w_height - p_height) / 2;
+          width = p_width;
+          height = p_height;
           color = Raylib.Color.create 0x83 0xf5 0x68 0xff;
         };
-      window_width = width;
-      window_height = height;
+      window_width = w_width;
+      window_height = w_height;
       background = Raylib.Color.create 0x68 0x83 0xf5 0xff;
       acceleration = 100.0;
     }
   in
-  Raylib.init_window width height "raylib example";
+  Raylib.init_window w_width w_height "OCaml Pong";
   Raylib.set_target_fps 60;
   s
 
