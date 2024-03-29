@@ -1,3 +1,7 @@
+module Ball = struct
+  type t = { pos_x : int; pos_y : int; radius : float; color : Raylib.Color.t }
+end
+
 type t = {
   player1 : Player.t;
   player2 : Player.t;
