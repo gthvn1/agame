@@ -20,8 +20,12 @@ Try to write a "pong game" in OCaml using Raylib...
 - [ ] managing ball movement
 - [ ] counting score maybe...
 - [ ] ...
-      
-## Links
+
+# Screenshots
+
+<img align="center" src="https://github.com/gthvn1/opong/blob/master/screenshots/first_screenshot.png">
+
+# Links
 
 - [OCaml](https://ocaml.org/)
 - [Raylib](https://www.raylib.com/)
