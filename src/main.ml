@@ -9,7 +9,7 @@ let setup () =
   let s : S.t =
     {
       (* it is the upper left corner that is center... *)
-      player1 =
+      pleft =
         {
           pos_x = margin;
           pos_y = (w_height - p_height) / 2;
@@ -17,7 +17,7 @@ let setup () =
           height = p_height;
           color = R.Color.create 0xf5 0x68 0x83 0xff;
         };
-      player2 =
+      pright =
         {
           pos_x = w_width - margin - p_width;
           pos_y = (w_height - p_height) / 2;
@@ -48,12 +48,12 @@ let setup () =
   s
 
 (** [update state] updates and returns a new state.
- *   player1:
+ *   pleft:
  *       a  --> move left   --> will be Q for french kb
  *       s  --> move down
  *       d  --> move up
  *       f  --> move right
- *   player2:
+ *   pright:
  *       j  --> move left
  *       k  --> move down
  *       l  --> move up
@@ -67,11 +67,11 @@ let update (s : S.t) =
     else if R.is_key_down key_up then -1 * velocity
     else 0
   in
-  (* Update player 1 according to key press *)
-  let s = S.update_player1 s (delta R.Key.A R.Key.F) (delta R.Key.D R.Key.S) in
-  (* Update player 2 according to key press *)
+  (* Update left player according to key pressed *)
+  let s = S.update_pleft s (delta R.Key.A R.Key.F) (delta R.Key.D R.Key.S) in
+  (* Update right player according to key pressed *)
   let s =
-    S.update_player2 s (delta R.Key.J R.Key.Semicolon) (delta R.Key.K R.Key.L)
+    S.update_pright s (delta R.Key.J R.Key.Semicolon) (delta R.Key.K R.Key.L)
   in
   (* and return the state after incrementing a little bit the speed *)
   S.increment_acceleration s 0.1
@@ -82,10 +82,10 @@ let draw (s : S.t) =
   R.clear_background s.window.background;
 
   (* draw players *)
-  R.draw_rectangle s.player1.pos_x s.player1.pos_y s.player1.width
-    s.player1.height s.player1.color;
-  R.draw_rectangle s.player2.pos_x s.player2.pos_y s.player2.width
-    s.player2.height s.player2.color;
+  R.draw_rectangle s.pleft.pos_x s.pleft.pos_y s.pleft.width s.pleft.height
+    s.pleft.color;
+  R.draw_rectangle s.pright.pos_x s.pright.pos_y s.pright.width s.pright.height
+    s.pright.color;
 
   (* draw the ball *)
   R.draw_circle s.ball.pos_x s.ball.pos_y s.ball.radius s.ball.color;

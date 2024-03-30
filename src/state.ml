@@ -24,8 +24,8 @@ module Window = struct
 end
 
 type t = {
-  player1 : Player.t;
-  player2 : Player.t;
+  pleft : Player.t;
+  pright : Player.t;
   ball : Ball.t;
   window : Window.t;
   acceleration : float;
@@ -38,14 +38,14 @@ type t = {
 let update_player (s : t) (left : bool) dx dy =
   let m = s.window.margin in
   let min_x, max_x =
-    if left then (m, (s.window.width / 2) - m - s.player1.width)
+    if left then (m, (s.window.width / 2) - m - s.pleft.width)
     else ((s.window.width / 2) + m, s.window.width - m)
   in
-  let min_y, max_y = (0, s.window.height - s.player1.height) in
+  let min_y, max_y = (0, s.window.height - s.pleft.height) in
   (* players has the same height *)
   let pos_x, pos_y =
-    if left then (s.player1.pos_x, s.player1.pos_y)
-    else (s.player2.pos_x, s.player2.pos_y)
+    if left then (s.pleft.pos_x, s.pleft.pos_y)
+    else (s.pright.pos_x, s.pright.pos_y)
   in
   let new_x = pos_x + dx in
   let new_y = pos_y + dy in
@@ -57,12 +57,11 @@ let update_player (s : t) (left : bool) dx dy =
     if new_y < min_y then min_y else if new_y > max_y then max_y else new_y
   in
   (* can now update the player *)
-  if left then
-    { s with player1 = { s.player1 with pos_x = new_x; pos_y = new_y } }
-  else { s with player2 = { s.player2 with pos_x = new_x; pos_y = new_y } }
+  if left then { s with pleft = { s.pleft with pos_x = new_x; pos_y = new_y } }
+  else { s with pright = { s.pright with pos_x = new_x; pos_y = new_y } }
 
-let update_player1 (s : t) dx dy = update_player s true dx dy
-let update_player2 (s : t) dx dy = update_player s false dx dy
+let update_pleft (s : t) dx dy = update_player s true dx dy
+let update_pright (s : t) dx dy = update_player s false dx dy
 
 let increment_acceleration (s : t) v =
   (* we limite the acceleration to 1000.0 *)
