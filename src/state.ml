@@ -1,33 +1,27 @@
 module R = Raylib
 
-module Ball = struct
-  type t = { pos_x : int; pos_y : int; radius : float; color : R.Color.t }
-end
+type ball = { pos_x : int; pos_y : int; radius : float; color : R.Color.t }
 
-module Player = struct
-  type t = {
-    pos_x : int;
-    pos_y : int;
-    width : int;
-    height : int;
-    color : R.Color.t;
-  }
-end
+type player = {
+  pos_x : int;
+  pos_y : int;
+  width : int;
+  height : int;
+  color : R.Color.t;
+}
 
-module Window = struct
-  type t = {
-    width : int;
-    height : int;
-    margin : int; (* Left/Right margin used to check player limits *)
-    background : R.Color.t;
-  }
-end
+type window = {
+  width : int;
+  height : int;
+  margin : int; (* Left/Right margin used to check player limits *)
+  background : R.Color.t;
+}
 
 type t = {
-  pleft : Player.t;
-  pright : Player.t;
-  ball : Ball.t;
-  window : Window.t;
+  pleft : player;
+  pright : player;
+  ball : ball;
+  window : window;
   acceleration : float;
 }
 (** Main structure of State.ml *)
