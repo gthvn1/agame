@@ -1,11 +1,10 @@
 module R = Raylib
 
 type ball = {
-  pos_x : int;
-  pos_y : int;
+  pos : R.Vector2.t;
+  speed : R.Vector2.t;
   radius : float;
   color : R.Color.t;
-  served : bool;
 }
 
 type player = {
@@ -39,7 +38,7 @@ let update_player (left : bool) dx dy (s : t) =
   let m = s.window.margin in
   let min_x, max_x =
     if left then (m, (s.window.width / 2) - m - s.pleft.width)
-    else ((s.window.width / 2) + m, s.window.width - m)
+    else ((s.window.width / 2) + m, s.window.width - m - s.pright.width)
   in
   let min_y, max_y = (0, s.window.height - s.pleft.height) in
   (* players has the same height *)

@@ -29,11 +29,13 @@ let setup () =
         {
           (* At the beginning of the game it is the left player
              that will serve. So put the ball on him. *)
-          pos_x = margin + p_width + 5;
-          pos_y = w_height / 2;
+          pos =
+            R.Vector2.create
+              (float_of_int @@ (margin + p_width + 5))
+              (float_of_int @@ (w_height / 2));
+          speed = R.Vector2.create 0.0 0.0;
           radius = 5.0;
           color = R.Color.black;
-          served = false;
         };
       window =
         {
@@ -89,7 +91,7 @@ let draw (s : S.t) =
     s.pright.color;
 
   (* draw the ball *)
-  R.draw_circle s.ball.pos_x s.ball.pos_y s.ball.radius s.ball.color;
+  R.draw_circle_v s.ball.pos s.ball.radius s.ball.color;
 
   (* draw the sepration line that in the middle *)
   R.draw_line (s.window.width / 2) 0 (s.window.width / 2) s.window.height
