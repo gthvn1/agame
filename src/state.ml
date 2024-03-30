@@ -12,29 +12,15 @@ module Player = struct
     height : int;
     color : R.Color.t;
   }
-
-  let update_player (p : t) (dx : int) (dy : int) (maxx : int) (maxy : int) =
-    (* Check x boundary *)
-    let new_x = p.pos_x + dx in
-    let upper_x = maxx - p.width in
-    let new_x =
-      if new_x > upper_x then upper_x else if new_x < 0 then 0 else new_x
-    in
-    (* check y boundary *)
-    let new_y = p.pos_y + dy in
-    let upper_y = maxy - p.height in
-    let new_y =
-      if new_y > upper_y then upper_y else if new_y < 0 then 0 else new_y
-    in
-    { p with pos_x = new_x; pos_y = new_y }
 end
 
 module Window = struct
-  type t = { 
-    width : int; 
-    height : int; 
-    margin: int; (* Left/Right margin used to check player limits *)
-  background : R.Color.t }
+  type t = {
+    width : int;
+    height : int;
+    margin : int; (* Left/Right margin used to check player limits *)
+    background : R.Color.t;
+  }
 end
 
 type t = {
@@ -46,17 +32,37 @@ type t = {
 }
 (** Main structure of State.ml *)
 
-let update_player1 (s : t) dx dy =
-  let new_p =
-    Player.update_player s.player1 dx dy s.window.width s.window.height
+(** [update_player state left delta_x delta_y] update the position of the player
+    using [delta_x] and [delta_y]. It will check the boundaries depending he is
+    to the left or right of the tennis court. *)
+let update_player (s : t) (left : bool) dx dy =
+  let m = s.window.margin in
+  let min_x, max_x =
+    if left then (m, (s.window.width / 2) - m - s.player1.width)
+    else ((s.window.width / 2) + m, s.window.width - m)
   in
-  { s with player1 = new_p }
+  let min_y, max_y = (0, s.window.height - s.player1.height) in
+  (* players has the same height *)
+  let pos_x, pos_y =
+    if left then (s.player1.pos_x, s.player1.pos_y)
+    else (s.player2.pos_x, s.player2.pos_y)
+  in
+  let new_x = pos_x + dx in
+  let new_y = pos_y + dy in
+  (* check boundaries *)
+  let new_x =
+    if new_x < min_x then min_x else if new_x > max_x then max_x else new_x
+  in
+  let new_y =
+    if new_y < min_y then min_y else if new_y > max_y then max_y else new_y
+  in
+  (* can now update the player *)
+  if left then
+    { s with player1 = { s.player1 with pos_x = new_x; pos_y = new_y } }
+  else { s with player2 = { s.player2 with pos_x = new_x; pos_y = new_y } }
 
-let update_player2 (s : t) dx dy =
-  let new_p =
-    Player.update_player s.player2 dx dy s.window.width s.window.height
-  in
-  { s with player2 = new_p }
+let update_player1 (s : t) dx dy = update_player s true dx dy
+let update_player2 (s : t) dx dy = update_player s false dx dy
 
 let increment_acceleration (s : t) v =
   (* we limite the acceleration to 1000.0 *)
