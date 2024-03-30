@@ -70,14 +70,12 @@ let update (s : S.t) =
     else 0
   in
   (* Update left player according to key pressed *)
-  let s = S.update_pleft s (delta R.Key.A R.Key.F) (delta R.Key.D R.Key.S) in
+  S.update_pleft (delta R.Key.A R.Key.F) (delta R.Key.D R.Key.S) s
   (* Update right player according to key pressed *)
-  let s =
-    S.update_pright s (delta R.Key.J R.Key.Semicolon) (delta R.Key.K R.Key.L)
-  in
-  let s = S.update_ball s in
+  |> S.update_pright (delta R.Key.J R.Key.Semicolon) (delta R.Key.K R.Key.L)
+  |> S.update_ball
   (* and return the state after incrementing a little bit the speed *)
-  S.update_speed s 1.0
+  |> S.update_speed 1.0
 
 (** [draw state] draws the scene and return [state]. *)
 let draw (s : S.t) =

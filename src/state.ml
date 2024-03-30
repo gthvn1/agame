@@ -32,10 +32,10 @@ type t = {
 }
 (** structure of State.ml *)
 
-(** [update_player state left delta_x delta_y] update the position of the player
+(** [update_player left delta_x delta_y state] update the position of the player
     using [delta_x] and [delta_y]. It will check the boundaries depending he is
     to the left or right of the tennis court. It returns the new state. *)
-let update_player (s : t) (left : bool) dx dy =
+let update_player (left : bool) dx dy (s : t) =
   let m = s.window.margin in
   let min_x, max_x =
     if left then (m, (s.window.width / 2) - m - s.pleft.width)
@@ -60,16 +60,16 @@ let update_player (s : t) (left : bool) dx dy =
   if left then { s with pleft = { s.pleft with pos_x = new_x; pos_y = new_y } }
   else { s with pright = { s.pright with pos_x = new_x; pos_y = new_y } }
 
-let update_pleft (s : t) dx dy = update_player s true dx dy
-let update_pright (s : t) dx dy = update_player s false dx dy
+let update_pleft dx dy (s : t) = update_player true dx dy s
+let update_pright dx dy (s : t) = update_player false dx dy s
 
 (** [update_ball state] update the position of the ball and return the new state. *)
 let update_ball (s : t) = s
 
-(** [update_speed state velocity] add the [velocity] to the state.
+(** [update_speed velocity state] add the [velocity] to the state.
     We can not reach a velocity greated than 1000.0 and we can not go below
     a velocity of 10.0 and return the new state *)
-let update_speed (s : t) v =
+let update_speed v (s : t) =
   (* we limite the speed to 1000.0 *)
   let max_speed = 1000.0 in
   let min_speed = 10.0 in
