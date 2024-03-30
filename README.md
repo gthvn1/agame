@@ -13,6 +13,14 @@ Try to write a "pong game" in OCaml using Raylib...
     - and install raylib: `opam install raylib`
 - we can run the project using `dune exec opong`
 
+# Todo
+- [x] drawing the window
+- [x] drawing the players, the ball and the let
+- [x] managing players movements
+- [ ] managing ball movement
+- [ ] counting score maybe...
+- [ ] ...
+      
 ## Links
 
 - [OCaml](https://ocaml.org/)
