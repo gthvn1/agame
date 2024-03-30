@@ -1,6 +1,12 @@
 module R = Raylib
 
-type ball = { pos_x : int; pos_y : int; radius : float; color : R.Color.t }
+type ball = {
+  pos_x : int;
+  pos_y : int;
+  radius : float;
+  color : R.Color.t;
+  served : bool;
+}
 
 type player = {
   pos_x : int;
@@ -22,13 +28,13 @@ type t = {
   pright : player;
   ball : ball;
   window : window;
-  acceleration : float;
+  speed : float;
 }
-(** Main structure of State.ml *)
+(** structure of State.ml *)
 
 (** [update_player state left delta_x delta_y] update the position of the player
     using [delta_x] and [delta_y]. It will check the boundaries depending he is
-    to the left or right of the tennis court. *)
+    to the left or right of the tennis court. It returns the new state. *)
 let update_player (s : t) (left : bool) dx dy =
   let m = s.window.margin in
   let min_x, max_x =
@@ -57,12 +63,21 @@ let update_player (s : t) (left : bool) dx dy =
 let update_pleft (s : t) dx dy = update_player s true dx dy
 let update_pright (s : t) dx dy = update_player s false dx dy
 
-let increment_acceleration (s : t) v =
-  (* we limite the acceleration to 1000.0 *)
-  let max_acc = 1000.0 in
-  let new_acceleration = s.acceleration +. v in
+(** [update_ball state] update the position of the ball and return the new state. *)
+let update_ball (s : t) = s
+
+(** [update_speed state velocity] add the [velocity] to the state.
+    We can not reach a velocity greated than 1000.0 and we can not go below
+    a velocity of 10.0 and return the new state *)
+let update_speed (s : t) v =
+  (* we limite the speed to 1000.0 *)
+  let max_speed = 1000.0 in
+  let min_speed = 10.0 in
+  let new_speed = s.speed +. v in
   {
     s with
-    acceleration =
-      (if new_acceleration > max_acc then max_acc else new_acceleration);
+    speed =
+      (if new_speed > max_speed then max_speed
+       else if new_speed < min_speed then min_speed
+       else new_speed);
   }

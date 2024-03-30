@@ -27,11 +27,13 @@ let setup () =
         };
       ball =
         {
-          (* Let's put the ball in random place for now *)
-          pos_x = 40;
-          pos_y = 40;
+          (* At the beginning of the game it is the left player
+             that will serve. So put the ball on him. *)
+          pos_x = margin + p_width + 5;
+          pos_y = w_height / 2;
           radius = 5.0;
           color = R.Color.black;
+          served = false;
         };
       window =
         {
@@ -40,7 +42,7 @@ let setup () =
           margin;
           background = R.Color.create 0x68 0x83 0xf5 0xff;
         };
-      acceleration = 100.0;
+      speed = 100.0;
     }
   in
   R.init_window w_width w_height "OCaml Pong";
@@ -61,7 +63,7 @@ let setup () =
  *)
 let update (s : S.t) =
   let frate : float = R.get_frame_time () in
-  let velocity = int_of_float @@ (frate *. s.acceleration) in
+  let velocity = int_of_float @@ (frate *. s.speed) in
   let delta key_up key_down =
     if R.is_key_down key_down then velocity
     else if R.is_key_down key_up then -1 * velocity
@@ -73,8 +75,9 @@ let update (s : S.t) =
   let s =
     S.update_pright s (delta R.Key.J R.Key.Semicolon) (delta R.Key.K R.Key.L)
   in
+  let s = S.update_ball s in
   (* and return the state after incrementing a little bit the speed *)
-  S.increment_acceleration s 0.1
+  S.update_speed s 1.0
 
 (** [draw state] draws the scene and return [state]. *)
 let draw (s : S.t) =
