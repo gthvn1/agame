@@ -33,7 +33,7 @@ let setup () =
             R.Vector2.create
               (float_of_int @@ (margin + p_width + 5))
               (float_of_int @@ (w_height / 2));
-          speed = R.Vector2.create 0.0 0.0;
+          speed = R.Vector2.zero ();
           radius = 5.0;
           color = R.Color.black;
         };

@@ -63,7 +63,16 @@ let update_pleft dx dy (s : t) = update_player true dx dy s
 let update_pright dx dy (s : t) = update_player false dx dy s
 
 (** [update_ball state] update the position of the ball and return the new state. *)
-let update_ball (s : t) = s
+let update_ball (s : t) =
+  let b = s.ball in
+  if R.Vector2.x b.speed = 0.0 && R.Vector2.y b.speed = 0.0 then (
+    (* we need to follow the left player until he serves *)
+    let px = s.pleft.pos_x + s.pleft.width in
+    let py = s.pleft.pos_y + (s.pleft.height / 2) in
+    R.Vector2.set_x b.pos @@ float_of_int px;
+    R.Vector2.set_y b.pos @@ float_of_int py;
+    { s with ball = b })
+  else s (* update ball when moving *)
 
 (** [update_speed velocity state] add the [velocity] to the state.
     We can not reach a velocity greated than 1000.0 and we can not go below
