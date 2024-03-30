@@ -1,5 +1,7 @@
+module R = Raylib
+
 module Ball = struct
-  type t = { pos_x : int; pos_y : int; radius : float; color : Raylib.Color.t }
+  type t = { pos_x : int; pos_y : int; radius : float; color : R.Color.t }
 end
 
 module Player = struct
@@ -8,7 +10,7 @@ module Player = struct
     pos_y : int;
     width : int;
     height : int;
-    color : Raylib.Color.t;
+    color : R.Color.t;
   }
 
   let update_player (p : t) (dx : int) (dy : int) (maxx : int) (maxy : int) =
@@ -27,25 +29,32 @@ module Player = struct
     { p with pos_x = new_x; pos_y = new_y }
 end
 
+module Window = struct
+  type t = { 
+    width : int; 
+    height : int; 
+    margin: int; (* Left/Right margin used to check player limits *)
+  background : R.Color.t }
+end
+
 type t = {
   player1 : Player.t;
   player2 : Player.t;
   ball : Ball.t;
-  window_width : int;
-  window_height : int;
-  background : Raylib.Color.t;
+  window : Window.t;
   acceleration : float;
 }
+(** Main structure of State.ml *)
 
 let update_player1 (s : t) dx dy =
   let new_p =
-    Player.update_player s.player1 dx dy s.window_width s.window_height
+    Player.update_player s.player1 dx dy s.window.width s.window.height
   in
   { s with player1 = new_p }
 
 let update_player2 (s : t) dx dy =
   let new_p =
-    Player.update_player s.player2 dx dy s.window_width s.window_height
+    Player.update_player s.player2 dx dy s.window.width s.window.height
   in
   { s with player2 = new_p }
 
