@@ -11,9 +11,14 @@ module V = struct
 
   let get_coord (v : R.Vector2.t) = (R.Vector2.x v, R.Vector2.y v)
 
-  let reverse (v : R.Vector2.t) =
-    let x, y = get_coord v in
-    R.Vector2.create (-.x) y
+  let multf (v1 : R.Vector2.t) (v2 : R.Vector2.t) =
+    let x1, y1 = get_coord v1 in
+    let x2, y2 = get_coord v2 in
+    R.Vector2.create (x1 *. x2) (y1 *. y2)
+
+  let reverse_x = multf (R.Vector2.create (-1.0) 1.0)
+  let reverse_y = multf (R.Vector2.create 1.0 (-1.0))
+  let reverse = multf (R.Vector2.create (-1.0) (-1.0))
 end
 
 module Player = struct
@@ -102,8 +107,10 @@ let update_ball (serving : bool) (s : t) =
   if not_inplay then (
     (* we need to follow the left player until he serves *)
     let delta = R.Vector2.create pl_width (pl_height /. 2.0) in
+    let new_speed = 2.0 in
     (* if serves then update the speed x axis to 5.0 *)
-    if serving then R.Vector2.set_x b.speed 5.0 else ();
+    if serving then R.Vector2.set_x b.speed new_speed else ();
+    if serving then R.Vector2.set_y b.speed new_speed else ();
     { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } })
   else
     (* we need to check if the new position is hitting a player *)
@@ -114,9 +121,10 @@ let update_ball (serving : bool) (s : t) =
     let pright_x, pright_y = Player.get_pos s.pright in
     (* Both players have the same size *)
     let _, player_height = Player.get_size s.pright in
+    let _, win_height = Window.get_size s.window in
     if old_pos_x > pleft_x && new_pos_x < pleft_x then
+      (* Hit player left *)
       if
-        (* Hit player left *)
         (old_pos_y < pleft_y && new_pos_y < pleft_y)
         || old_pos_y > pleft_y +. player_height
            && new_pos_y > pleft_y +. player_height
@@ -124,10 +132,10 @@ let update_ball (serving : bool) (s : t) =
         { s with ball = { b with pos = new_pos } }
       else
         (* we hit the ball *)
-        { s with ball = { b with pos = new_pos; speed = V.reverse b.speed } }
+        { s with ball = { b with pos = new_pos; speed = V.reverse_x b.speed } }
     else if old_pos_x < pright_x && new_pos_x > pright_x then
+      (* Hit player right *)
       if
-        (* Hit player right *)
         (old_pos_y < pright_y && new_pos_y < pright_y)
         || old_pos_y > pright_y +. player_height
            && new_pos_y > pright_y +. player_height
@@ -137,8 +145,14 @@ let update_ball (serving : bool) (s : t) =
         {
           (* we hit the ball *)
           s with
-          ball = { b with pos = new_pos; speed = V.reverse b.speed };
+          ball = { b with pos = new_pos; speed = V.reverse_x b.speed };
         }
+    else if new_pos_y <= 0.0 || new_pos_y >= win_height then
+      {
+        (* we hit the top or bottom *)
+        s with
+        ball = { b with pos = new_pos; speed = V.reverse_y b.speed };
+      }
     else { s with ball = { b with pos = new_pos } }
 
 (** [update_speed velocity state] add the [velocity] to the state.
