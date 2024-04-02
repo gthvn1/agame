@@ -93,14 +93,16 @@ let draw (s : S.t) =
   R.clear_background s.window.background;
 
   (* draw players *)
-  R.draw_rectangle
-    (int_of_float (R.Vector2.x s.pleft.pos))
-    (int_of_float (R.Vector2.y s.pleft.pos))
-    s.pleft.width s.pleft.height s.pleft.color;
-  R.draw_rectangle
-    (int_of_float (R.Vector2.x s.pright.pos))
-    (int_of_float (R.Vector2.y s.pright.pos))
-    s.pright.width s.pright.height s.pright.color;
+  R.draw_rectangle_v s.pleft.pos
+    (R.Vector2.create
+       (float_of_int s.pleft.width)
+       (float_of_int s.pleft.height))
+    s.pleft.color;
+  R.draw_rectangle_v s.pright.pos
+    (R.Vector2.create
+       (float_of_int s.pright.width)
+       (float_of_int s.pright.height))
+    s.pright.color;
 
   (* draw the ball *)
   R.draw_circle_v s.ball.pos s.ball.radius s.ball.color;

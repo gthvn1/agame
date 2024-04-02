@@ -76,7 +76,7 @@ let update_ball (s : t) =
         (float_of_int s.pleft.width)
         (float_of_int (s.pleft.height / 2))
     in
-    { s with ball = { b with pos = R.Vector2.add b.pos delta } }
+    { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } }
   else s (* update ball when moving *)
 
 (** [update_speed velocity state] add the [velocity] to the state.
