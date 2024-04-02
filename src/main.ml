@@ -66,6 +66,7 @@ let update (s : S.t) =
     else if R.is_key_down key_up then -1.0 *. velocity
     else 0.0
   in
+  let serve = R.is_key_pressed R.Key.Space in
   (* Update left player according to key pressed *)
   S.update_pleft
     (R.Vector2.create (delta R.Key.A R.Key.F) (delta R.Key.D R.Key.S))
@@ -75,7 +76,7 @@ let update (s : S.t) =
        (R.Vector2.create
           (delta R.Key.J R.Key.Semicolon)
           (delta R.Key.K R.Key.L))
-  |> S.update_ball
+  |> S.update_ball serve
   (* and return the state after incrementing a little bit the speed *)
   |> S.update_speed 1.0
 
