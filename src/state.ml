@@ -10,6 +10,10 @@ module V = struct
     R.Vector2.x v1 = R.Vector2.x v2 && R.Vector2.y v1 = R.Vector2.y v2
 
   let get_coord (v : R.Vector2.t) = (R.Vector2.x v, R.Vector2.y v)
+
+  let reverse (v : R.Vector2.t) =
+    let x, y = get_coord v in
+    R.Vector2.create (-.x) y
 end
 
 module Player = struct
@@ -101,7 +105,41 @@ let update_ball (serving : bool) (s : t) =
     (* if serves then update the speed x axis to 5.0 *)
     if serving then R.Vector2.set_x b.speed 5.0 else ();
     { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } })
-  else { s with ball = { b with pos = R.Vector2.add b.pos b.speed } }
+  else
+    (* we need to check if the new position is hitting a player *)
+    let new_pos_x, new_pos_y = V.get_coord @@ R.Vector2.add b.pos b.speed in
+    let new_pos = R.Vector2.create new_pos_x new_pos_y in
+    let old_pos_x, old_pos_y = Ball.get_pos b in
+    let pleft_x, pleft_y = Player.get_pos s.pleft in
+    let pright_x, pright_y = Player.get_pos s.pright in
+    (* Both players have the same size *)
+    let _, player_height = Player.get_size s.pright in
+    if old_pos_x > pleft_x && new_pos_x < pleft_x then
+      if
+        (* Hit player left *)
+        (old_pos_y < pleft_y && new_pos_y < pleft_y)
+        || old_pos_y > pleft_y +. player_height
+           && new_pos_y > pleft_y +. player_height
+      then (* we missed the ball *)
+        { s with ball = { b with pos = new_pos } }
+      else
+        (* we hit the ball *)
+        { s with ball = { b with pos = new_pos; speed = V.reverse b.speed } }
+    else if old_pos_x < pright_x && new_pos_x > pright_x then
+      if
+        (* Hit player right *)
+        (old_pos_y < pright_y && new_pos_y < pright_y)
+        || old_pos_y > pright_y +. player_height
+           && new_pos_y > pright_y +. player_height
+      then { (* we missed the ball *)
+             s with ball = { b with pos = new_pos } }
+      else
+        {
+          (* we hit the ball *)
+          s with
+          ball = { b with pos = new_pos; speed = V.reverse b.speed };
+        }
+    else { s with ball = { b with pos = new_pos } }
 
 (** [update_speed velocity state] add the [velocity] to the state.
     We can not reach a velocity greated than 1000.0 and we can not go below
