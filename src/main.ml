@@ -3,54 +3,46 @@ module S = State
 
 (** [setup] sets state [s], init the window and return [s]. *)
 let setup () =
-  let w_width, w_height = (800, 450) in
-  let p_width, p_height = (8, 64) in
-  let margin = 10 in
+  let w_width, w_height = (800.0, 450.0) in
+  let p_width, p_height = (8.0, 64.0) in
+  let margin = 10.0 in
   let s : S.t =
     {
       (* it is the upper left corner that is center... *)
       pleft =
         {
-          pos =
-            R.Vector2.create (float_of_int margin)
-              (float_of_int @@ ((w_height - p_height) / 2));
-          width = p_width;
-          height = p_height;
+          pos = R.Vector2.create margin ((w_height -. p_height) /. 2.0);
+          size = R.Vector2.create p_width p_height;
           color = R.Color.create 0xf5 0x68 0x83 0xff;
         };
       pright =
         {
           pos =
             R.Vector2.create
-              (float_of_int @@ (w_width - margin - p_width))
-              (float_of_int @@ ((w_height - p_height) / 2));
-          width = p_width;
-          height = p_height;
+              (w_width -. margin -. p_width)
+              ((w_height -. p_height) /. 2.0);
+          size = R.Vector2.create p_width p_height;
           color = R.Color.create 0x83 0xf5 0x68 0xff;
         };
       ball =
         {
           (* At the beginning of the game it is the left player
              that will serve. So put the ball on him. *)
-          pos =
-            R.Vector2.create
-              (float_of_int @@ (margin + p_width + 5))
-              (float_of_int @@ (w_height / 2));
+          pos = R.Vector2.create (margin +. p_width +. 5.0) (w_height /. 2.0);
           speed = R.Vector2.zero ();
           radius = 5.0;
           color = R.Color.black;
         };
       window =
         {
-          width = w_width;
-          height = w_height;
+          size = R.Vector2.create w_width w_height;
           margin;
           background = R.Color.create 0x68 0x83 0xf5 0xff;
         };
       speed = 100.0;
     }
   in
-  R.init_window w_width w_height "OCaml Pong";
+  R.init_window (int_of_float w_width) (int_of_float w_height) "OCaml Pong";
   R.set_target_fps 60;
   s
 
@@ -89,27 +81,21 @@ let update (s : S.t) =
 
 (** [draw state] draws the scene and return [state]. *)
 let draw (s : S.t) =
+  let win_width = int_of_float @@ State.Window.width s.window in
+  let win_height = int_of_float @@ State.Window.height s.window in
   R.begin_drawing ();
   R.clear_background s.window.background;
 
   (* draw players *)
-  R.draw_rectangle_v s.pleft.pos
-    (R.Vector2.create
-       (float_of_int s.pleft.width)
-       (float_of_int s.pleft.height))
-    s.pleft.color;
-  R.draw_rectangle_v s.pright.pos
-    (R.Vector2.create
-       (float_of_int s.pright.width)
-       (float_of_int s.pright.height))
-    s.pright.color;
+  R.draw_rectangle_v s.pleft.pos s.pleft.size s.pleft.color;
+  R.draw_rectangle_v s.pright.pos s.pright.size s.pright.color;
 
   (* draw the ball *)
   R.draw_circle_v s.ball.pos s.ball.radius s.ball.color;
 
-  (* draw the sepration line that in the middle *)
-  R.draw_line (s.window.width / 2) 0 (s.window.width / 2) s.window.height
-    R.Color.black;
+  (* draw the separation line that in the middle *)
+  R.draw_line (win_width / 2) 0 (win_width / 2) win_height R.Color.black;
+
   R.end_drawing ();
   s (* return it so it can be chained beautifully with loop *)
 

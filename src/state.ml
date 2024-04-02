@@ -1,31 +1,37 @@
 module R = Raylib
 
-type ball = {
-  pos : R.Vector2.t;
-  speed : R.Vector2.t;
-  radius : float;
-  color : R.Color.t;
-}
+module Player = struct
+  type t = { pos : R.Vector2.t; size : R.Vector2.t; color : R.Color.t }
 
-type player = {
-  pos : R.Vector2.t;
-  width : int;
-  height : int;
-  color : R.Color.t;
-}
+  let width (p : t) = R.Vector2.x p.size
+  let height (p : t) = R.Vector2.y p.size
+end
 
-type window = {
-  width : int;
-  height : int;
-  margin : int; (* Left/Right margin used to check player limits *)
-  background : R.Color.t;
-}
+module Ball = struct
+  type t = {
+    pos : R.Vector2.t;
+    speed : R.Vector2.t;
+    radius : float;
+    color : R.Color.t;
+  }
+end
+
+module Window = struct
+  type t = {
+    size : R.Vector2.t;
+    margin : float; (* Left/Right margin used to check player limits *)
+    background : R.Color.t;
+  }
+
+  let width (w : t) = R.Vector2.x w.size
+  let height (w : t) = R.Vector2.y w.size
+end
 
 type t = {
-  pleft : player;
-  pright : player;
-  ball : ball;
-  window : window;
+  pleft : Player.t;
+  pright : Player.t;
+  ball : Ball.t;
+  window : Window.t;
   speed : float;
 }
 (** structure of State.ml *)
@@ -35,18 +41,22 @@ type t = {
     to the left or right of the tennis court. It returns the new state. *)
 let update_player (left : bool) (dv : R.Vector2.t) (s : t) =
   let m = s.window.margin in
-  (* set boundariies minx, miny, max, maxy for the given player *)
-  let min_x = float_of_int @@ if left then m else (s.window.width / 2) + m in
+  let win_width = Window.width s.window in
+  let win_height = Window.height s.window in
+  let pl_width = Player.width s.pleft in
+  let pl_height = Player.height s.pleft in
+  let pr_width = Player.width s.pright in
+
+  (* set boundaries minx, miny, max, maxy for the given player *)
+  let min_x = if left then m else (win_width /. 2.0) +. m in
   let max_x =
-    float_of_int
-    @@
-    if left then (s.window.width / 2) - m - s.pleft.width
-    else s.window.width - m - s.pright.width
+    if left then (win_width /. 2.0) -. m -. pl_width
+    else win_width -. m -. pr_width
   in
   let min_y = 0.0 in
-  let max_y = float_of_int @@ (s.window.height - s.pleft.height) in
-
   (* players has the same height *)
+  let max_y = win_height -. pl_height in
+
   let current_pos = if left then s.pleft.pos else s.pright.pos in
   let new_pos = R.Vector2.add current_pos dv in
 
@@ -69,13 +79,11 @@ let update_pright dv (s : t) = update_player false dv s
 (** [update_ball state] update the position of the ball and return the new state. *)
 let update_ball (s : t) =
   let b = s.ball in
+  let pl_width = Player.width s.pleft in
+  let pl_height = Player.height s.pleft in
   if R.Vector2.x b.speed = 0.0 && R.Vector2.y b.speed = 0.0 then
     (* we need to follow the left player until he serves *)
-    let delta =
-      R.Vector2.create
-        (float_of_int s.pleft.width)
-        (float_of_int (s.pleft.height / 2))
-    in
+    let delta = R.Vector2.create pl_width (pl_height /. 2.0) in
     { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } }
   else s (* update ball when moving *)
 
