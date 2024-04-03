@@ -9,11 +9,11 @@ Try to write a "pong game" in OCaml using Raylib...
 - and we install `dune` to manage the project
     - you can install others tools like `utop` or `ocaml-lsp-server`.
 - you also need to install the [raylib ocaml bindings](https://ocaml.org/p/raylib/0.5.1)
-    - automatically install dependencies: `opam depext raylib`
+    - automatically install dependencies if supported by your distro: `opam depext raylib`
     - and install raylib: `opam install raylib`
  
 # Running
-- we can run the project using `dune exec opong`
+- `dune exec opong`
 
 # Todo
 - [x] drawing the window
