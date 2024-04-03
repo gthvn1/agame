@@ -22,7 +22,12 @@ module V = struct
 end
 
 module Player = struct
-  type t = { pos : R.Vector2.t; size : R.Vector2.t; color : R.Color.t }
+  type t = {
+    pos : R.Vector2.t;
+    size : R.Vector2.t;
+    color : R.Color.t;
+    score : int;
+  }
 
   let string_of_pos (p : t) = V.string_of_v p.pos
   let get_pos (p : t) = V.get_coord p.pos
@@ -124,7 +129,7 @@ let update_ball (serving : bool) (s : t) =
       let pright_x, pright_y = Player.get_pos s.pright in
       (* Both players have the same size *)
       let _, player_height = Player.get_size s.pright in
-      let _, win_height = Window.get_size s.window in
+      let win_weight, win_height = Window.get_size s.window in
       if old_pos_x > pleft_x && new_pos_x < pleft_x then
         (* Hit player left *)
         if
@@ -159,12 +164,19 @@ let update_ball (serving : bool) (s : t) =
           s with
           ball = { b with pos = new_pos; speed = V.reverse_y b.speed };
         }
-      else
+      else if new_pos_x <= 0.0 then
         {
-          (* nothing special happens, just update the position of the ball *)
           s with
-          ball = { b with pos = new_pos };
+          pright = { s.pright with score = s.pright.score + 1 };
+          ball = { b with pos = new_pos; speed = R.Vector2.zero () };
         }
+      else if new_pos_x >= win_weight then
+        {
+          s with
+          pleft = { s.pleft with score = s.pleft.score + 1 };
+          ball = { b with pos = new_pos; speed = R.Vector2.zero () };
+        }
+      else { s with ball = { b with pos = new_pos } }
 
 (** [update_speed velocity state] add the [velocity] to the state.
     We can not reach a velocity greated than 1000.0 and we can not go below

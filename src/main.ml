@@ -14,6 +14,7 @@ let setup () =
           pos = R.Vector2.create margin ((w_height -. p_height) /. 2.0);
           size = R.Vector2.create p_width p_height;
           color = R.Color.create 0xf5 0x68 0x83 0xff;
+          score = 0;
         };
       pright =
         {
@@ -23,6 +24,7 @@ let setup () =
               ((w_height -. p_height) /. 2.0);
           size = R.Vector2.create p_width p_height;
           color = R.Color.create 0x83 0xf5 0x68 0xff;
+          score = 0;
         };
       ball =
         {
@@ -80,6 +82,7 @@ let update (s : S.t) =
        (R.Vector2.create
           (delta R.Key.J R.Key.Semicolon)
           (delta R.Key.K R.Key.L))
+  (* Score is updated when detecting that ball goes out of the court *)
   |> S.update_ball serve
   (* and return the state after incrementing a little bit the speed *)
   |> S.update_speed 1.0
@@ -89,6 +92,7 @@ let draw (s : S.t) =
   let win_width, win_height = State.Window.get_size s.window in
   let win_width = int_of_float win_width in
   let win_height = int_of_float win_height in
+  let half_width = win_width / 2 in
 
   R.begin_drawing ();
   R.clear_background s.window.background;
@@ -113,13 +117,22 @@ let draw (s : S.t) =
   (* draw the separation line that in the middle *)
   R.draw_line (win_width / 2) 0 (win_width / 2) win_height R.Color.black;
 
+  (* print the score *)
+  R.draw_text
+    (string_of_int s.pleft.score)
+    (half_width / 2) 5 40 R.Color.darkgray;
+  R.draw_text
+    (string_of_int s.pright.score)
+    (3 * half_width / 2)
+    5 40 R.Color.darkgray;
+
   R.end_drawing ();
-  s (* return it so it can be chained beautifully with loop *)
+  s (* return the state so it can be chained beautifully with loop *)
 
 (** [loop state] is the main loop that updates and draws scene. *)
 let rec loop (s : S.t) =
   match R.window_should_close () with
   | true -> R.close_window ()
-  | false -> update s |> draw |> loop
+  | false -> s |> update |> draw |> loop
 
 let () = setup () |> loop
