@@ -23,7 +23,7 @@ Try to write a "pong game" in OCaml using Raylib...
 - [x] reset the position when one player miss the ball
 - [x] counting score
 - [ ] be more acurate when ball hitting players
-- [ ] improve the ball movement (manage differant angle, ...)
+- [ ] improve the ball movement (manage different angles, ...)
 - [ ] add effects on the ball (slice, ...)
 
 # Screenshots
