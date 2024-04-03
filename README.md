@@ -11,6 +11,8 @@ Try to write a "pong game" in OCaml using Raylib...
 - you also need to install the [raylib ocaml bindings](https://ocaml.org/p/raylib/0.5.1)
     - automatically install dependencies: `opam depext raylib`
     - and install raylib: `opam install raylib`
+ 
+# Running
 - we can run the project using `dune exec opong`
 
 # Todo
