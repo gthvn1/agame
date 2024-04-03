@@ -99,61 +99,72 @@ let update_player (left : bool) (dv : R.Vector2.t) (s : t) =
 let update_pleft dv (s : t) = update_player true dv s
 let update_pright dv (s : t) = update_player false dv s
 
-(** [update_ball state] update the position of the ball and return the new state. *)
+(** [update_ball state] update the position of the ball and return the new state.
+    Currently we don't play with angles. Also only left player is serving. *)
 let update_ball (serving : bool) (s : t) =
   let b = s.ball in
   let pl_width, pl_height = Player.get_size s.pleft in
-  let not_inplay = V.equal b.speed (R.Vector2.zero ()) in
-  if not_inplay then (
-    (* we need to follow the left player until he serves *)
-    let delta = R.Vector2.create pl_width (pl_height /. 2.0) in
-    let new_speed = 2.0 in
-    (* if serves then update the speed x axis to 5.0 *)
-    if serving then R.Vector2.set_x b.speed new_speed else ();
-    if serving then R.Vector2.set_y b.speed new_speed else ();
-    { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } })
-  else
-    (* we need to check if the new position is hitting a player *)
-    let new_pos_x, new_pos_y = V.get_coord @@ R.Vector2.add b.pos b.speed in
-    let new_pos = R.Vector2.create new_pos_x new_pos_y in
-    let old_pos_x, old_pos_y = Ball.get_pos b in
-    let pleft_x, pleft_y = Player.get_pos s.pleft in
-    let pright_x, pright_y = Player.get_pos s.pright in
-    (* Both players have the same size *)
-    let _, player_height = Player.get_size s.pright in
-    let _, win_height = Window.get_size s.window in
-    if old_pos_x > pleft_x && new_pos_x < pleft_x then
-      (* Hit player left *)
-      if
-        (old_pos_y < pleft_y && new_pos_y < pleft_y)
-        || old_pos_y > pleft_y +. player_height
-           && new_pos_y > pleft_y +. player_height
-      then (* we missed the ball *)
-        { s with ball = { b with pos = new_pos } }
-      else
-        (* we hit the ball *)
-        { s with ball = { b with pos = new_pos; speed = V.reverse_x b.speed } }
-    else if old_pos_x < pright_x && new_pos_x > pright_x then
-      (* Hit player right *)
-      if
-        (old_pos_y < pright_y && new_pos_y < pright_y)
-        || old_pos_y > pright_y +. player_height
-           && new_pos_y > pright_y +. player_height
-      then { (* we missed the ball *)
-             s with ball = { b with pos = new_pos } }
+  match V.equal b.speed (R.Vector2.zero ()) with
+  | true ->
+      (* Ball without speed means that player has not served yet. So we need to
+         follow the left player until he serves.
+         TODO: Allow both player to serve. *)
+      let delta = R.Vector2.create pl_width (pl_height /. 2.0) in
+      let new_speed = 2.0 in
+      (* if serves then update the speed *)
+      if serving then R.Vector2.set_x b.speed new_speed else ();
+      if serving then R.Vector2.set_y b.speed new_speed else ();
+      { s with ball = { b with pos = R.Vector2.add s.pleft.pos delta } }
+  | false ->
+      (* we need to check if the new position is hitting a player *)
+      let new_pos_x, new_pos_y = V.get_coord @@ R.Vector2.add b.pos b.speed in
+      let new_pos = R.Vector2.create new_pos_x new_pos_y in
+      let old_pos_x, old_pos_y = Ball.get_pos b in
+      let pleft_x, pleft_y = Player.get_pos s.pleft in
+      let pright_x, pright_y = Player.get_pos s.pright in
+      (* Both players have the same size *)
+      let _, player_height = Player.get_size s.pright in
+      let _, win_height = Window.get_size s.window in
+      if old_pos_x > pleft_x && new_pos_x < pleft_x then
+        (* Hit player left *)
+        if
+          (old_pos_y < pleft_y && new_pos_y < pleft_y)
+          || old_pos_y > pleft_y +. player_height
+             && new_pos_y > pleft_y +. player_height
+        then (* we missed the ball *)
+          { s with ball = { b with pos = new_pos } }
+        else
+          (* we hit the ball *)
+          {
+            s with
+            ball = { b with pos = new_pos; speed = V.reverse_x b.speed };
+          }
+      else if old_pos_x < pright_x && new_pos_x > pright_x then
+        (* Hit player right *)
+        if
+          (old_pos_y < pright_y && new_pos_y < pright_y)
+          || old_pos_y > pright_y +. player_height
+             && new_pos_y > pright_y +. player_height
+        then { (* we missed the ball *)
+               s with ball = { b with pos = new_pos } }
+        else
+          {
+            (* we hit the ball *)
+            s with
+            ball = { b with pos = new_pos; speed = V.reverse_x b.speed };
+          }
+      else if new_pos_y <= 0.0 || new_pos_y >= win_height then
+        {
+          (* we hit the top or bottom *)
+          s with
+          ball = { b with pos = new_pos; speed = V.reverse_y b.speed };
+        }
       else
         {
-          (* we hit the ball *)
+          (* nothing special happens, just update the position of the ball *)
           s with
-          ball = { b with pos = new_pos; speed = V.reverse_x b.speed };
+          ball = { b with pos = new_pos };
         }
-    else if new_pos_y <= 0.0 || new_pos_y >= win_height then
-      {
-        (* we hit the top or bottom *)
-        s with
-        ball = { b with pos = new_pos; speed = V.reverse_y b.speed };
-      }
-    else { s with ball = { b with pos = new_pos } }
 
 (** [update_speed velocity state] add the [velocity] to the state.
     We can not reach a velocity greated than 1000.0 and we can not go below
